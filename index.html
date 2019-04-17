@@ -1,0 +1,155 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <style>
+            .chest
+            {
+                height: 150px;
+                width: 400px;
+                background-color: black;
+                margin-bottom: 4px;
+                margin-left: 2px;
+                margin-right: 2px;
+            }
+            
+            .win
+            {
+                height: 150px;
+                width: 400px;
+                background-color: green;
+                margin-bottom: 4px;
+                margin-left: 2px;
+                margin-right: 2px;
+            }
+            
+            .empty
+            {
+                height: 150px;
+                width: 400px;
+                background-color: red;
+                margin-bottom: 4px;
+                margin-left: 2px;
+                margin-right: 2px;
+            }
+            #boxes
+            {
+                margin: 0 auto;
+            }
+        </style>
+    </head>
+    
+    <body>
+        <div class="container">
+            <h4>Treasure Hunt</h4>
+            <div id="boxes" class="row justify-content-center"></div>
+            <div id="guess"></div>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        
+        <script>
+            /* global $ */
+            $(document).ready(function()
+            {
+                let model = {};
+                
+                function initializeModel()
+                {
+                    model.chestNum = 6;
+                    model.chests = [];
+                    model.treasure = Math.floor(Math.random() * model.chestNum);
+                    model.guesses = 0;
+                    model.again = true;
+                    for(var i = 0; i < model.chestNum; i++)
+                    {
+                        model.chests.push({'clicked' : false});
+                    }
+                }
+                
+                function updateView()
+                {
+                    $('#boxes').empty();
+                    for(var i = 0; i < model.chestNum; i++)
+                    {
+                        let item = $("<div></div>");
+                        item.attr('id', i);
+                        if(model.chests[i].clicked && i == model.treasure)
+                        {
+                            item.removeClass('chest');
+                            item.addClass('win');
+                        }
+                        else if(model.chests[i].clicked && i != model.treasure)
+                        {
+                            item.removeClass('chest');
+                            item.addClass('empty');
+                        }
+                        else
+                        {
+                            item.addClass('chest');
+                        }
+                        $('#boxes').append(item);
+                    }
+                    $('#guess').empty();
+                    $('#guess').append('Guesses: ');
+                    $('#guess').append(model.guesses);
+                    
+                }
+                
+                $(document).on('click', '.chest', function()
+                {
+                    if(model.again != false)
+                    {
+                        model.guesses++;
+                        console.log('You clicked ', $(this).attr('id'));
+                        let i = $(this).attr('id');
+                        model.chests[i].clicked = true;
+                        if(i == model.treasure)
+                        {
+                            console.log('You won!');
+                            $('#playAgain').modal('show');
+                        }
+                        else
+                        {
+                            console.log('Try Again');
+                        }
+                        updateView();
+                    }
+                });
+                
+                $('#again').click(function()
+                {
+                    initializeModel();
+                    updateView();
+                });
+                
+                $('#no-more').click(function()
+                {
+                    model.again = false;
+                    $('playAgain').modal('hide');
+                });
+                
+                initializeModel();
+                updateView();
+            });
+        </script>
+        
+        <div class="modal fade" id="playAgain" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Play Again?</h5>
+              </div>
+              <div class="modal-body">
+                Would you like to play again?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="again" data-dismiss="modal" aria-label="Close">Yes</button>
+                <button type="button" class="btn btn-secondary" id="no-more" data-dismiss="modal" aria-label="Close">No</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+    </body>
+</html>
